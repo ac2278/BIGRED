@@ -20,3 +20,7 @@ You should have received a copy of the GNU General Public License
 along with BIGRED.  If not, see <http://www.gnu.org/licenses/>.
 
 ---
+
+Required files:
+The R function BIGRED() requires three types of files: a header file for each chromosome, an alias text file for each proband, and an allelic depth (AD) data file for each proband and chromosome. See below for a description of each file and formatting requirements. Save required files in the working directory. 
+

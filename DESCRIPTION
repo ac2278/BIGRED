@@ -1,0 +1,9 @@
+Package: BIGRED
+Version: 0.1
+Date: 2017-10-23
+Title: Bayes Inferred Genotype Replicate Error Detector (BIGRED)
+Description: A statistical framework to detect mislabeled or contaminated
+    samples using shallow-depth sequence data.
+Author: Ariel W Chan <ac2278@cornell.edu>
+Maintainer: Ariel W Chan <ac2278@cornell.edu>
+License: GPL-3

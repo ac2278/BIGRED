@@ -27,7 +27,7 @@ along with BIGRED.  If not, see <http://www.gnu.org/licenses/>.
 3. An allelic depth (AD) data file for each proband and chromosome
 
 ---
-##### 1. A header file for each chromosome (mandatory)
+#### 1. A header file for each chromosome (mandatory)
   
 **Description:**
 
@@ -60,11 +60,11 @@ We show the header line and the first three rows of file chr001_gbsheader below:
 | NA         | 1         | 21597  |
 | 0.962656   | 1         | 26576  |
 
-##### 2. An alias text file for each proband (mandatory).
+#### 2. An alias text file for each proband (mandatory).
   
 **Description:**
 
-This text file lists the sample IDs of the $k$ putative replicates of the proband in question (one sample ID per line). 
+This text file lists the sample IDs of the _k_ putative replicates of the proband in question (one sample ID per line). 
 
 **Header Line:**
 
@@ -80,13 +80,13 @@ The file should contain no missing values.
 
 **Example:**
 
-We collected, extracted, and sequenced DNA from proband I011206 a total of $k=3$ times, assigning the names 'I011206:250300325', 'I011206:250099287', and 'TMS011206:250134484' to the three samples. We show the contents of file I011206_aliases.txt below:
+We collected, extracted, and sequenced DNA from proband I011206 a total of _k_ = 3 times, assigning the names 'I011206:250300325', 'I011206:250099287', and 'TMS011206:250134484' to the three samples. We show the contents of file I011206_aliases.txt below:
 
 | I011206:250300325
 | I011206:250099287
 | TMS011206:250134484
 
-##### 3. An allelic depth (AD) data file containing AD data for the $k$ putative replicates of the proband in question (one file per chromosome)
+#### 3. An allelic depth (AD) data file containing AD data for the _k_ putative replicates of the proband in question (one file per chromosome)
 
 **Description:**
 
@@ -95,7 +95,7 @@ AD data consists of two (comma-separated) integers, representing the observed co
 1. CHROM
 2. POS
 
-Columns 3 through $k$+2 list the AD data for the $k$ putative replicates (the IDs of which are listed in the alias file) of the proband in question. 
+Columns 3 through _k_ + 2 list the AD data for the _k_ putative replicates (the IDs of which are listed in the alias file) of the proband in question. 
 
 **Header Line:**
 

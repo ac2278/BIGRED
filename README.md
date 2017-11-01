@@ -21,6 +21,10 @@ along with BIGRED.  If not, see <http://www.gnu.org/licenses/>.
 
 ---
 
+Researchers typically sequence a given individual multiple times, either re-sequencing the same DNA sample (technical replication) or sequencing different DNA samples collected on the same individual (biological replication) or both. Before merging the data from these replicate sequence runs, it is important to verify that no errors, such as DNA contamination or mix-ups, occurred during the data collection pipeline. BTRED is a R package that performs said task. Using Bayes Theorem, BTRED calculates the posterior probability distribution over the set of relations describing the putative replicates of an individual and infers which of the samples originated from an identical genotypic source. BTRED addresses key limitations of existing methods and produced highly accurate results in simulation experiments. BTRED requires no genotype calling, haplotype phasing, or genotype imputation, making it a suitable tool for studies relying on low- or medium-depth, high-throughput sequence data. 
+
+---
+
 ##### Required files:
 1. A header file for each chromosome
 2. An alias text file for each proband

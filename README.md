@@ -86,9 +86,11 @@ The file should contain no missing values.
 
 We collected, extracted, and sequenced DNA from proband I011206 a total of _k_ = 3 times, assigning the names 'I011206:250300325', 'I011206:250099287', and 'TMS011206:250134484' to the three samples. We show the contents of file I011206_aliases.txt below:
 
-| I011206:250300325
-| I011206:250099287
-| TMS011206:250134484
+I011206:250300325
+
+I011206:250099287
+
+TMS011206:250134484
 
 #### 3. An allelic depth (AD) data file containing AD data for the _k_ putative replicates of the proband in question (one file per chromosome)
 

@@ -2,6 +2,6 @@
 
 export(BIGRED)
 export(enumerateG_revised)
-export(enumerateI)
+export(enumerateS)
 export(normGL)
 export(thin)

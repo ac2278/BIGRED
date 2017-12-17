@@ -9,14 +9,14 @@ BIGRED(L, chrom, mafrange, thinby, eUSER, proband, aliases.fn, expid,
 }
 \arguments{
 \item{L}{(numeric integer) specifies the number of sites to sample and use for analysis.
-A site is sampled if >0 reads were observed at that site for EACH of the k putative replicates.}
+BTRED samples a site if each putative replicate has at least one read at that site.}
 
 \item{chrom}{(numeric vector) specifies the chromosome(s) from which to sample the
 L sites.}
 
-\item{mafrange}{(numeric vector; length 2) specifies a range for the minor allele frequency (MAF)
-of the sites to be sampled. The default is set as c(0.0,0.5), i.e. sample sites
-regardless of MAF status. We found that the algorithm is most accurate when analyzing sites
+\item{mafrange}{(numeric vector; length 2) a site is sampled if its minor allele has a frequency
+within this range. The default is set to c(0.0,0.5), i.e. BTRED will sample sites
+regardless of MAF status. We found that BTRED is most accurate when analyzing sites
 with MAFs in the range (0.4,0.5] in simulation experiments (paper in review). We do not recommend
 sampling sites with rare minor alleles.}
 
@@ -28,22 +28,22 @@ For an error rate of 1 percent, enter 0.01.}
 
 \item{proband}{(character) specifies the name of the genotype with k putative replicates, where k >1.}
 
-\item{aliases.fn}{(character) specifies the alias text file listing the names of the proband's k
-putative sequence runs. Refer to the README file for a description of an alias text file
+\item{aliases.fn}{(character) specifies the name of the alias text file listing the names of the proband's k
+putative sequence runs. Refer to README.md for a description of an alias text file
 and formatting requirements.}
 
-\item{expid}{(character) only specify an argument for this parameter
-if you wish to run the function on _A_GIVEN_ proband multiple times _SIMULATANEOUSLY_. One
-potential reason for applying BIGRED multiple times on one given proband would be if the user
-wishes to average the results of multiple runs, rather than relying on the results of one run.
-Use this parameter to avoid overwriting output files. A different value of ${expid} should
-be used for each of these runs.}
+\item{expid}{(character) only specify an argument for this parameter if you wish to run the function on
+a given proband multiple times, simultaneouly. One potential reason for applying BIGRED
+on one given proband more than once would be if the user wishes to average the results
+of multiple runs, rather than relying on the results of one run. If the user executes these
+runs simultaneously, a different value of this parameter should be used for each run to avoid
+overwriting output files.}
 
-\item{headersuffix}{(character) this function requires a header file for each chromosome (refer to the
-README file for a description of this file type and formatting requirements).
-Each header file follows the naming format chr${chromosome}_${headersuffix}.
-Enter ${headersuffix} as the argument for this parameter.
-Example: The ${headersuffix} associated with header file chr001_gbsheader is
+\item{headersuffix}{(character) BTRED() requires a header file for each chromosome (refer to
+README.md for a description of this file type and formatting requirements).
+Each header file must follow the naming format chr[chromosome]_[headersuffix].
+Enter [headersuffix] as the argument for this parameter.
+Example: The headersuffix associated with header file chr001_gbsheader is
 'gbsheader'.}
 
 \item{ncores}{(numeric interger) specifies the number of cores to be used while running the function
@@ -56,19 +56,19 @@ Files will be saved in the current working directory. Output filenames end with 
 Example filename:
 I011206_chrom1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18_L1000_maf0.4,0.5_thinby20000_BIGRED.rds}
 
-\item{returnwhat}{(character) specifies what is returned by the function. The user may select one of three options: "pI", "truereplicates", or "all".
-                    Selecting "pI" returns the posterior probability of each identity vector.
+\item{returnwhat}{(character) specifies what is returned by the function. The user may select one of three options: "pS", "truereplicates", or "all".
+                    Selecting "pS" returns the posterior probability of each identity vector.
                     Selecting "truereplicates" returns the ID of replicates determined by the algorithm to originate from the proband.
                     The user must also supply an arguement for the parameter ${threshold} if selecting this option. Refer to (14) for
                     a description of ${threshold}.
-                    **NOTE** The algorithm selects the source that has a clear majority. As an example, when Pr( I=(1,1,2) | X ) > threshold,
+                    **NOTE** The algorithm selects the source that has a clear majority. As an example, when Pr( S=(1,1,2) | X ) > threshold,
                     the algorithm returns the IDs of putative replicates d=1 and d=2 (source 1). For the case where there is no clear
-                    majority, the algorithm randomly selects a source to return. As an example, when Pr( I=(1,1,2,2) | X ) > threshold,
+                    majority, the algorithm randomly selects a source to return. As an example, when Pr( S=(1,1,2,2) | X ) > threshold,
                     the algorithm returns the IDs of either replicates d=1 and d=2 (source 1) or d=3 and d=4 (source 2). As another example,
-                    when Pr( I=(1,2,3) | X) > threshold, the algorithm returns the ID of either d=1 (source 1), d=2 (source 2), or d=3 (source 3).
+                    when Pr( S=(1,2,3) | X) > threshold, the algorithm returns the ID of either d=1 (source 1), d=2 (source 2), or d=3 (source 3).
                     Selecting "all" returns a list of four elements:
                          (1) replicatenames: (named list) the sample IDs of the k putative replicates associated with the proband
-                         (2)             pI: (numeric vector) the posterior probability of each identity vector
+                         (2)             pS: (numeric vector) the posterior probability of each identity vector
                          (3)     statistics: (numeric vector) the mean read depth across the thinned set of sites for each sample
                          (4)      sitenames: (character vector) the sites sampled by the algorithm listed using the notation
                                              ${chromosome}_${physical position}}
@@ -86,7 +86,7 @@ I011206_chrom1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18_L1000_maf0.4,0.5_thinb
 The function _outputs_ an Rds file storing a list with two elements: 'results' (class: list) and 'runtime' (class: proc_time).
            results (list; length 4):
                (1) replicatenames: (list) the sample IDs of the k putative replicates associated with the proband
-               (2) pI: (numeric vector) the posterior probability of each identity vector
+               (2) pS: (numeric vector) the posterior probability of each identity vector
                (3) statistics: (numeric vector) the mean read depth across the thinned set of sites for each sample
                (4) sitenames: (character vector) the sites sampled by the algorithm listed using the notation
                               ${chromosome}_${physical position}

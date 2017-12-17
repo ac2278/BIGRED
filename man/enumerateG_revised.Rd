@@ -4,19 +4,19 @@
 \alias{enumerateG_revised}
 \title{Enumerate genotypic vectors}
 \usage{
-enumerateG_revised(k, I.list)
+enumerateG_revised(k, S.list)
 }
 \arguments{
 \item{k}{(numeric integer) specifies the number of putatitive replicates associated with
               the proband in question.}
 
-\item{I.list}{(list) output from \code{\link{enumerateI}}.}
+\item{S.list}{(list) output from \code{\link{enumerateS}}.}
 }
 \value{
 The function returns a list of length two:
-     (1) `G|I`: (list) enumerates all genotype vectors consistent with identity vector i
-     (2) `P(G|I)`: (vector) provides the probability of genotype vector g given identity vector i.
-                   We compute P(G|I) assuming the uniform probability law (i.e. 1/cardinality of set).
+     (1) `G|S`: (list) enumerates all genotype vectors consistent with source vector s
+     (2) `P(G|S)`: (vector) provides the probability of genotype vector g given source vector s.
+                   We compute P(G|S) assuming the uniform probability law (i.e. 1/cardinality of set).
 }
 \description{
 Enumerates all genotypic vectors of length k consistent with each identity vector.

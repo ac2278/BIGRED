@@ -3,12 +3,12 @@
 #' @description Detects outlier(s) among supposed replicate sequence runs of a given genotype
 #'
 #' @param            L (numeric integer) specifies the number of sites to sample and use for analysis. 
-#'                     A site is sampled if >0 reads were observed at that site for EACH of the k putative replicates.
+#'                     BTRED samples a site if each putative replicate has at least one read at that site.
 #' @param        chrom (numeric vector) specifies the chromosome(s) from which to sample the
 #'                     L sites.
-#' @param     mafrange (numeric vector; length 2) specifies a range for the minor allele frequency (MAF) 
-#'                     of the sites to be sampled. The default is set as c(0.0,0.5), i.e. sample sites 
-#'                     regardless of MAF status. We found that the algorithm is most accurate when analyzing sites
+#' @param     mafrange (numeric vector; length 2) a site is sampled if its minor allele has a frequency 
+#'                     within this range. The default is set to c(0.0,0.5), i.e. BTRED will sample sites 
+#'                     regardless of MAF status. We found that BTRED is most accurate when analyzing sites
 #'                     with MAFs in the range (0.4,0.5] in simulation experiments (paper in review). We do not recommend
 #'                     sampling sites with rare minor alleles.
 #' @param       thinby (numeric interger) specifies the minimum distance (in bp) between any two sampled sites
@@ -16,20 +16,20 @@
 #'                     genotype likelihoods. This value may range from 0 to 1. 
 #'                     For an error rate of 1 percent, enter 0.01.
 #' @param      proband (character) specifies the name of the genotype with k putative replicates, where k >1.
-#' @param   aliases.fn (character) specifies the alias text file listing the names of the proband's k 
-#'                     putative sequence runs. Refer to the README file for a description of an alias text file 
-#'                     and formatting requirements.  
-#' @param        expid (character) only specify an argument for this parameter 
-#'                     if you wish to run the function on _A_GIVEN_ proband multiple times _SIMULATANEOUSLY_. One 
-#'                     potential reason for applying BIGRED multiple times on one given proband would be if the user 
-#'                     wishes to average the results of multiple runs, rather than relying on the results of one run. 
-#'                     Use this parameter to avoid overwriting output files. A different value of ${expid} should 
-#'                     be used for each of these runs.
-#' @param headersuffix (character) this function requires a header file for each chromosome (refer to the 
-#'                     README file for a description of this file type and formatting requirements). 
-#'                     Each header file follows the naming format chr${chromosome}_${headersuffix}.  
-#'                     Enter ${headersuffix} as the argument for this parameter. 
-#'                     Example: The ${headersuffix} associated with header file chr001_gbsheader is 
+#' @param   aliases.fn (character) specifies the name of the alias text file listing the names of the proband's k 
+#'                     putative sequence runs. Refer to README.md for a description of an alias text file 
+#'                     and formatting requirements.
+#' @param        expid (character) only specify an argument for this parameter if you wish to run the function on
+#'                     a given proband multiple times, simultaneouly. One potential reason for applying BIGRED 
+#'                     on one given proband more than once would be if the user wishes to average the results 
+#'                     of multiple runs, rather than relying on the results of one run. If the user executes these 
+#'                     runs simultaneously, a different value of this parameter should be used for each run to avoid
+#'                     overwriting output files.
+#' @param headersuffix (character) BTRED() requires a header file for each chromosome (refer to  
+#'                     README.md for a description of this file type and formatting requirements). 
+#'                     Each header file must follow the naming format chr[chromosome]_[headersuffix].  
+#'                     Enter [headersuffix] as the argument for this parameter. 
+#'                     Example: The headersuffix associated with header file chr001_gbsheader is 
 #'                     'gbsheader'.
 #' @param       ncores (numeric interger) specifies the number of cores to be used while running the function 
 #'                     (only portions of the function are parallelized). 
@@ -39,19 +39,19 @@
 #'                     Files will be saved in the current working directory. Output filenames end with the suffix '.rds'.
 #'                     Example filename: 
 #'                     I011206_chrom1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18_L1000_maf0.4,0.5_thinby20000_BIGRED.rds
-#' @param   returnwhat (character) specifies what is returned by the function. The user may select one of three options: "pI", "truereplicates", or "all".
-#'                     Selecting "pI" returns the posterior probability of each identity vector.
+#' @param   returnwhat (character) specifies what is returned by the function. The user may select one of three options: "pS", "truereplicates", or "all".
+#'                     Selecting "pS" returns the posterior probability of each identity vector.
 #'                     Selecting "truereplicates" returns the ID of replicates determined by the algorithm to originate from the proband. 
 #'                     The user must also supply an arguement for the parameter ${threshold} if selecting this option. Refer to (14) for 
 #'                     a description of ${threshold}.
-#'                     **NOTE** The algorithm selects the source that has a clear majority. As an example, when Pr( I=(1,1,2) | X ) > threshold, 
+#'                     **NOTE** The algorithm selects the source that has a clear majority. As an example, when Pr( S=(1,1,2) | X ) > threshold, 
 #'                     the algorithm returns the IDs of putative replicates d=1 and d=2 (source 1). For the case where there is no clear 
-#'                     majority, the algorithm randomly selects a source to return. As an example, when Pr( I=(1,1,2,2) | X ) > threshold, 
+#'                     majority, the algorithm randomly selects a source to return. As an example, when Pr( S=(1,1,2,2) | X ) > threshold, 
 #'                     the algorithm returns the IDs of either replicates d=1 and d=2 (source 1) or d=3 and d=4 (source 2). As another example, 
-#'                     when Pr( I=(1,2,3) | X) > threshold, the algorithm returns the ID of either d=1 (source 1), d=2 (source 2), or d=3 (source 3).
+#'                     when Pr( S=(1,2,3) | X) > threshold, the algorithm returns the ID of either d=1 (source 1), d=2 (source 2), or d=3 (source 3).
 #'                     Selecting "all" returns a list of four elements:
 #'                          (1) replicatenames: (named list) the sample IDs of the k putative replicates associated with the proband
-#'                          (2)             pI: (numeric vector) the posterior probability of each identity vector
+#'                          (2)             pS: (numeric vector) the posterior probability of each identity vector
 #'                          (3)     statistics: (numeric vector) the mean read depth across the thinned set of sites for each sample
 #'                          (4)      sitenames: (character vector) the sites sampled by the algorithm listed using the notation 
 #'                                              ${chromosome}_${physical position}
@@ -68,7 +68,7 @@
 #' @return The function _outputs_ an Rds file storing a list with two elements: 'results' (class: list) and 'runtime' (class: proc_time).    
 #'            results (list; length 4):
 #'                (1) replicatenames: (list) the sample IDs of the k putative replicates associated with the proband
-#'                (2) pI: (numeric vector) the posterior probability of each identity vector
+#'                (2) pS: (numeric vector) the posterior probability of each identity vector
 #'                (3) statistics: (numeric vector) the mean read depth across the thinned set of sites for each sample
 #'                (4) sitenames: (character vector) the sites sampled by the algorithm listed using the notation 
 #'                               ${chromosome}_${physical position}
@@ -169,16 +169,17 @@ BIGRED = function(L, chrom, mafrange, thinby, eUSER, proband, aliases.fn, expid,
                                            return(c("meanDP"=mean(y))) })
     
     
-    ## Initialize the algorithm by defining a prior on S, such that
-    ## P(S=s) = 1/k for s = {1,2,...,k}, where s denotes the total number
+    ## Initialize the algorithm by defining a prior on I, such that
+    ## P(I=i) = 1/k for i = {1,2,...,k}, where i denotes the total number
     ## of unique individuals from which the k (supposed) replicates derived.
-    ## When assuming a uniform prior over S, we induce a prior on I.
-    S <- enumerateI(k)
-    reference <- enumerateG_revised(k, S)
-    I <- names(reference[["P(G|I)"]])
-    nS <- sapply(paste("s=",1:k,sep=""), function(s){ nrow(do.call(rbind, S[[s]])) })
-    if(uniform=="onS"){ prior <- setNames(rep((1/k)/nS, nS), I) }
-    if(uniform=="onI"){ prior <- setNames(rep((1/length(I)), length(I)), I) }
+    ## When assuming a uniform prior over I, we induce a prior on S.
+
+    I <- enumerateS(k)
+    reference <- enumerateG_revised(k, I)
+    S <- names(reference[["P(G|S)"]])          # list all consistent source vectors
+    nI <- sapply(paste("i=",1:k,sep=""), function(i){ nrow(do.call(rbind, I[[i]])) })
+    if(uniform=="onI"){ prior <- setNames(rep((1/k)/nI, nI), S) }
+    if(uniform=="onS"){ prior <- setNames(rep((1/length(S)), length(S)), S) }
     
     ## Compute P(X(v)|G(v)=g), where g={AA,AB,BB} for all v and store these
     ## values in memory, eliminating the need to recompute P(X(v)|G(v)) at
@@ -191,15 +192,15 @@ BIGRED = function(L, chrom, mafrange, thinby, eUSER, proband, aliases.fn, expid,
                                                                          mode(bb) <- "numeric"; return(bb) });
                                            apply(memory, 1, prod) })
     
-    ## Define P(G(v)|I) as a function of (estimated) ALT frequency at site v.
-    ## P(G(v)|I) is defined as the probability that the k samples have
+    ## Define P(G(v)|S) as a function of (estimated) ALT frequency at site v.
+    ## P(G(v)|S) is defined as the probability that the k samples have
     ## the labeled genotype vector G(v) = ( G(v)_1, G(v)_2, ..., G(v)_k )
-    ## given that the k samples originate from identity vector I.
+    ## given that the k samples originate from source vector S.
     
-    #print("Define P(G(v)|I) as a function of (user-supplied) ALT frequency at site v.")
+    #print("Define P(G(v)|S) as a function of (user-supplied) ALT frequency at site v.")
     
-    step1 <- sapply(reference[["G|I"]], function(x) do.call(rbind, strsplit(x, ",")))
-    step2 <- rapply(strsplit(gsub("I=","",I), ","), duplicated, how="list")
+    step1 <- sapply(reference[["G|S"]], function(x) do.call(rbind, strsplit(x, ",")))
+    step2 <- rapply(strsplit(gsub("S=","",S), ","), duplicated, how="list")
     step3 <- mapply(function(x,y){ y <- ifelse(y==F,T,F);
                                    z <- as.matrix(x[,y]); return(z) }, x=step1, y=step2)
     pB <- AF[sitenames]
@@ -210,10 +211,10 @@ BIGRED = function(L, chrom, mafrange, thinby, eUSER, proband, aliases.fn, expid,
                                                                                            i[grep("BB", i)] <- v^2;
                                                                                            mode(i) <- "numeric"; i <- apply(i, 1, prod);
                                                                                            return(i) });
-                                                      memory <- mapply(function(x,y){names(x) <- y; return(x)}, x=memory, y=reference[["G|I"]]);
+                                                      memory <- mapply(function(x,y){names(x) <- y; return(x)}, x=memory, y=reference[["G|S"]]);
                                                       return(memory) })
     # likelihood stores P(X(v) | G(v))  
-    # extension6 stores P(G(v) | I)
+    # extension6 stores P(G(v) | S)
     
     ####################################################################################################
     ####################################################################################################
@@ -223,7 +224,7 @@ BIGRED = function(L, chrom, mafrange, thinby, eUSER, proband, aliases.fn, expid,
     p <- prior
     logp <- log(p)
     
-    a <- sapply(I, function(i){ sapply(sitenames, function(v){ sum(likelihood[names(extension6[[v]][[i]]), v]*extension6[[v]][[i]]) }) }) 
+    a <- sapply(S, function(s){ sapply(sitenames, function(v){ sum(likelihood[names(extension6[[v]][[s]]), v]*extension6[[v]][[s]]) }) }) 
     b <- apply(a, 2, log)
     c <- apply(b, 2, function(x) sum(x, na.rm=T))
     
@@ -240,7 +241,7 @@ BIGRED = function(L, chrom, mafrange, thinby, eUSER, proband, aliases.fn, expid,
       logden <- c(setdiff(logden, previous), updated)
     }
     p <- exp(lognum-logden)
-    output <- list("replicatenames"=replicatenames, "pI"=p, "statistics"=statistics, "sitenames"=sitenames)
+    output <- list("replicatenames"=replicatenames, "pS"=p, "statistics"=statistics, "sitenames"=sitenames)
     return(output)
   }      
   
@@ -276,7 +277,7 @@ BIGRED = function(L, chrom, mafrange, thinby, eUSER, proband, aliases.fn, expid,
   replicatenames <- list(); replicatenames[[proband]] <- colnames(data)
   start <- proc.time()
   results <- detect(replicatenames, distance=0, datafile=data,   # we set distance equal to zero because we thinned the sites in a previous step above
-                    eSEQ=eUSER, AF=af, uniform="onI")
+                    eSEQ=eUSER, AF=af, uniform="onS")
   end <- proc.time()-start
   
   if(missing(outprefix)){
@@ -287,16 +288,16 @@ BIGRED = function(L, chrom, mafrange, thinby, eUSER, proband, aliases.fn, expid,
   saveRDS(list("results"=results, "runtime"=end), results.fn)
   
   if(returnwhat=="all"){ return(list("results"=results, "runtime"=end)) }
-  if(returnwhat=="pI"){ return(results$pI) }
+  if(returnwhat=="pS"){ return(results$pS) }
   if(returnwhat=="truereplicates"){
-    if(threshold < 1/length(results$pI) | threshold == 1/length(results$pI)){
-      print("The user-defined threshold causes the algorithm to return results for more than one identity vector. Please specify a higher threshold.")
+    if(threshold < 1/length(results$pS) | threshold == 1/length(results$pS)){
+      print("The user-defined threshold causes the algorithm to return results for more than one source vector. Please specify a higher threshold.")
     }
     
-    if(threshold > 1/length(results$pI)){
-      ihat <- names(results$pI[grep(T, results$pI >threshold)])
+    if(threshold > 1/length(results$pS)){
+      ihat <- names(results$pS[grep(T, results$pS >threshold)])
       if(length(ihat)==1){
-        ihat <- sub("I=", "", ihat)
+        ihat <- sub("S=", "", ihat)
         isource <- paste("source", unlist(strsplit(ihat, ",")), sep="_")
         names(isource) <- replicates
         census <- table(isource)

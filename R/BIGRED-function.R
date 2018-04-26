@@ -3,7 +3,7 @@
 #' @description Detects outlier(s) among supposed replicate sequence runs of a given genotype
 #'
 #' @param            L (numeric integer) specifies the number of sites to sample and use for analysis. 
-#'                     BTRED samples a site if each putative replicate has at least one read at that site.
+#'                     BIGRED samples a site if each putative replicate has at least one read at that site.
 #' @param        chrom (numeric vector) specifies the chromosome(s) from which to sample the
 #'                     L sites.
 #' @param     mafrange (numeric vector; length 2) a site is sampled if its minor allele has a frequency 

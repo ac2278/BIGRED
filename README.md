@@ -99,7 +99,7 @@ AD data consists of two (comma-separated) integers, representing the observed co
 1. CHROM
 2. POS
 
-Columns 3 through _k_ + 2 list the AD data for the _k_ putative replicates (the IDs of which are listed in the alias file) of the proband in question. 
+Columns 3 through _k_ + 2 list the AD data for the _k_ putative replicates (the IDs of which are listed in the alias file) of the proband in question. Users can generate this file using VCFtools, using the command "--extract-FORMAT-info AD" and the option "--keep".
 
 **Header Line:**
 
@@ -124,5 +124,6 @@ We show the header line and the first three rows of file chr001_I011206.AD.FORMA
 | 1	    | 26576	| 5,0	              | 4,0	              | 7,0                 |
 
 Notice how column names for columns 3 through 5 are listed in I011206_aliases.txt. These two files must match.
+
 
 
